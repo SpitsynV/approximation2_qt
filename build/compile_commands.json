@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/approx2d_autogen/mocs_compilation.cpp.o -c /home/vl/approximation2_qt/build/approx2d_autogen/mocs_compilation.cpp",
+  "file": "/home/vl/approximation2_qt/build/approx2d_autogen/mocs_compilation.cpp",
+  "output": "CMakeFiles/approx2d.dir/approx2d_autogen/mocs_compilation.cpp.o"
+},
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/main.cpp.o -c /home/vl/approximation2_qt/main.cpp",
+  "file": "/home/vl/approximation2_qt/main.cpp",
+  "output": "CMakeFiles/approx2d.dir/main.cpp.o"
+},
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/func.cpp.o -c /home/vl/approximation2_qt/func.cpp",
+  "file": "/home/vl/approximation2_qt/func.cpp",
+  "output": "CMakeFiles/approx2d.dir/func.cpp.o"
+},
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/task3.cpp.o -c /home/vl/approximation2_qt/task3.cpp",
+  "file": "/home/vl/approximation2_qt/task3.cpp",
+  "output": "CMakeFiles/approx2d.dir/task3.cpp.o"
+},
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/task31.cpp.o -c /home/vl/approximation2_qt/task31.cpp",
+  "file": "/home/vl/approximation2_qt/task31.cpp",
+  "output": "CMakeFiles/approx2d.dir/task31.cpp.o"
+},
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/approximator2d.cpp.o -c /home/vl/approximation2_qt/approximator2d.cpp",
+  "file": "/home/vl/approximation2_qt/approximator2d.cpp",
+  "output": "CMakeFiles/approx2d.dir/approximator2d.cpp.o"
+},
+{
+  "directory": "/home/vl/approximation2_qt/build",
+  "command": "/usr/bin/g++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/vl/approximation2_qt/build/approx2d_autogen/include -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -isystem /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -g -std=gnu++17 -fPIC -o CMakeFiles/approx2d.dir/plotwidget2d.cpp.o -c /home/vl/approximation2_qt/plotwidget2d.cpp",
+  "file": "/home/vl/approximation2_qt/plotwidget2d.cpp",
+  "output": "CMakeFiles/approx2d.dir/plotwidget2d.cpp.o"
+}
+]

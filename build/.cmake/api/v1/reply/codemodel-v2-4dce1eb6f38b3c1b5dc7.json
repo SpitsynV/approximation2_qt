@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "approx2d",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "approx2d::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-approx2d-Debug-c9c7b4732532a312af8d.json",
+					"name" : "approx2d",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "approx2d_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-approx2d_autogen-Debug-76fd60a433e0ac42066c.json",
+					"name" : "approx2d_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "approx2d_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-approx2d_autogen_timestamp_deps-Debug-5814b44d89689c2fcf5d.json",
+					"name" : "approx2d_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/vl/approximation2_qt/build",
+		"source" : "/home/vl/approximation2_qt"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
