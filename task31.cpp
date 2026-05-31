@@ -1,4 +1,4 @@
-#include "task31.h"
+#include "task31.h" //по методу раздел разностей -ОК
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -42,7 +42,7 @@ static void computeDerivatives1D_SignMin(const double* x, const double* f, int n
 }
 
 // ----------------------------------------------------------------------
-// Кубическая интерполяция Эрмита на отрезке (та же, что и для 1.13)
+// Кубическая интерполяция на отрезке (та же, что и для 1.13)
 // ----------------------------------------------------------------------
 static double hermiteInterp1D(double x0, double x1, double y0, double y1, double dy0, double dy1, double x)
 {
@@ -74,33 +74,39 @@ void computeAllDerivatives31(int nx, int ny,
     dxy.assign(nx * ny, 0.0);
 
     // Производные по x (используем правило с sign и min)
+    std::vector<double> f_col(nx);
+    std::vector<double> d_col(nx);
     for (int j = 0; j < ny; ++j) {
-        std::vector<double> f_col(nx);
+        
         for (int i = 0; i < nx; ++i)
             f_col[i] = f_vals[i * ny + j];
-        std::vector<double> d_col(nx);
+        
         computeDerivatives1D_SignMin(x.data(), f_col.data(), nx, d_col.data());
         for (int i = 0; i < nx; ++i)
             dx[i * ny + j] = d_col[i];
     }
 
     // Производные по y
+    std::vector<double> f_row(ny);
+    std::vector<double> d_row(ny);
     for (int i = 0; i < nx; ++i) {
-        std::vector<double> f_row(ny);
+        
         for (int j = 0; j < ny; ++j)
             f_row[j] = f_vals[i * ny + j];
-        std::vector<double> d_row(ny);
+        
         computeDerivatives1D_SignMin(y.data(), f_row.data(), ny, d_row.data());
         for (int j = 0; j < ny; ++j)
             dy[i * ny + j] = d_row[j];
     }
 
     // Смешанные производные (∂/∂x от dy)
+    std::vector<double> dy_col(nx);
+    std::vector<double> dxy_col(nx);
     for (int j = 0; j < ny; ++j) {
-        std::vector<double> dy_col(nx);
+        
         for (int i = 0; i < nx; ++i)
             dy_col[i] = dy[i * ny + j];
-        std::vector<double> dxy_col(nx);
+        
         computeDerivatives1D_SignMin(x.data(), dy_col.data(), nx, dxy_col.data());
         for (int i = 0; i < nx; ++i)
             dxy[i * ny + j] = dxy_col[i];
