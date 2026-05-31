@@ -159,6 +159,21 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     bool needRebuild = false;
 
     switch (event->key()) {
+        //debug
+        case Qt::Key_D:
+    {
+    //const auto &x = m_approx->getX();
+    //const auto &f = m_approx->getF();
+    //fprintf(stderr, "=== Debug: n=%d, a=%.6f, b=%.6f ===\n", m_approx->n(), m_approx->a(), m_approx->b());
+    
+    //fprintf(stderr, "Max error method 1 = %e\n", m_approx->getMaxError1());
+    //fprintf(stderr, "Max error method 2 = %e\n", m_approx->getMaxError2());
+    // не меняем состояние и не перерисовываем
+    return;
+    }
+
+
+
     // 0 — циклически менять k (номер функции)
     case Qt::Key_0:
         m_approx->nextK();

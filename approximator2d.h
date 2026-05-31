@@ -16,8 +16,8 @@ public:
 
     // Значение исходной функции (с возмущением) и обоих приближений
     double f   (double x, double y) const;
-    double approx1(double x, double y) const;   // метод 3  (Ньютон)
-    double approx2(double x, double y) const;   // метод 31 (кусочный)
+    double approx1(double x, double y) const;   // метод 13  
+    double approx2(double x, double y) const;   // метод 31
 
     // Геттеры
     double a() const { return m_a; }

@@ -37,16 +37,16 @@ void Approximator2D::initGrid()
     for (int j = 0; j < m_ny; j++){
         m_y[j] = m_c + j * (m_d - m_c) / (m_ny - 1);
     }
-    // значения функции
+    // значения функции//
     m_f.resize(m_nx * m_ny);
     m_maxAbsF = 0.0;
     for (int i = 0; i < m_nx; i++) {
         for (int j = 0; j < m_ny; j++) {
             double v = GetExactValue(m_x[i], m_y[j], m_k);
             m_f[i * m_ny + j] = v;
-            m_dx[i*m_ny+j]= GetDX(m_x[i], m_y[j], m_k);
-            m_dy[i*m_ny+j]= GetDY(m_x[i], m_y[j], m_k);
-            m_dxy[i*m_ny+j]= GetDXY(m_x[i], m_y[j], m_k);
+            //m_dx[i*m_ny+j]= GetDX(m_x[i], m_y[j], m_k);
+            //m_dy[i*m_ny+j]= GetDY(m_x[i], m_y[j], m_k);
+            //m_dxy[i*m_ny+j]= GetDXY(m_x[i], m_y[j], m_k);
             m_maxAbsF = std::max(m_maxAbsF, std::fabs(v));
         }
     }
@@ -63,7 +63,7 @@ void Approximator2D::rebuild()
 {
     initGrid();
     computeAllDerivatives(m_nx,m_ny, m_x,m_y,m_f,m_adx, m_ady,m_adxy);
-    GetCoefficients31(m_nx, m_ny, m_x, m_y, m_f, m_c31);
+    computeAllDerivatives31(m_nx,m_ny, m_x,m_y,m_f,m_dx, m_dy,m_dxy);
 }
 
 void Approximator2D::setNx(int nx) { m_nx = std::max(2, nx); }
@@ -85,11 +85,20 @@ QString Approximator2D::functionName() const
 }
 
 // исходная функция с возмущением
-double Approximator2D::f(double x, double y) const///ПОПРАВЬ!
+double Approximator2D::f(double x, double y) const
 {
     double v = GetExactValue(x, y, m_k);
-    // возмущение применяется только в узловой точке — вне неё функция точная
-    // (как в 1D-задаче)
+    // возмущение применяется только в 1 точке
+    if (m_p != 0 && m_nx > 0 && m_ny>0) {
+        int midx = m_nx / 2;
+        int midy = m_ny/2;
+        // Сравнение с mid с учётом погрешности
+        if (std::abs(x - m_x[midx]) < 1e-12 * std::max(1.0, std::abs(x))) {
+            if(std::abs(y - m_y[midy]) < 1e-12 * std::max(1.0, std::abs(y))){
+                v += m_p * 0.1 * m_maxAbsF;
+            }
+        }
+    }
     return v;
 }
 
@@ -100,9 +109,8 @@ double Approximator2D::approx1(double x, double y) const
 
 double Approximator2D::approx2(double x, double y) const
 {
-    return GetValue31(x, y, m_x, m_nx, m_y, m_ny, m_c31);
+    return GetValue31(x, y,m_x,m_nx,m_y, m_ny,m_f,m_dx,m_dy,m_dxy );
 }
-
 std::function<double(double, double)> Approximator2D::getPlotFunc() const
 {
     switch (m_graphMode) {
