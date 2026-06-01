@@ -9,4 +9,9 @@
 double maxAbsoluteError(double a, double b, double c, double d,
      const std::function<double(double, double)> &exactFunc,
      const std::function<double(double, double)> &approxFunc, int N=1000);
+     
+double maxAbsoluteErrorParallel(double a, double b, double c, double d,
+    const std::function<double(double, double)> &exactFunc,
+    const std::function<double(double, double)> &approxFunc,
+    int N=1000, int numThreads=4);
 #endif

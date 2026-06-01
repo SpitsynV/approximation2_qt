@@ -3,6 +3,7 @@
 #include <functional>
 #include <QString>
 #include <QColor>
+#include "error.h"
 
 // Аналог Approximator из 1D-задачи — управляет состоянием и пересчётом
 class Approximator2D
@@ -14,10 +15,17 @@ public:
     // Пересчёт коэффициентов при изменении параметров
     void rebuild();
 
-    // Значение исходной функции (с возмущением) и обоих приближений
+    // Значение исходной функции (с возмущением) и всех приближений
     double f   (double x, double y) const;
-    double approx1(double x, double y) const;   // метод 13  
-    double approx2(double x, double y) const;   // метод 31
+    double approx1(double x, double y) const;   //Бессель
+    double approx2(double x, double y) const;   //Раздел разности
+    double approx3(double x, double y) const;   //Эрмит
+    double approx4(double x, double y) const;   //МНК Чебышев
+
+    double getMaxError1() const;
+    double getMaxError2() const;
+    double getMaxError3() const;
+    double getMaxError4() const;
 
     // Геттеры
     double a() const { return m_a; }
@@ -73,17 +81,27 @@ private:
     //сетка интерполяции
     std::vector<double> m_x, m_y;
     std::vector<double> m_f;      // m_f[i*m_ny+j] = f(m_x[i], m_y[j]) с возмущением
-    std::vector<double> m_dx;     // df/dx по той же формуле
+    std::vector<double> m_dx;     // df/dx по той же формуле(точные)
     std::vector<double> m_dy;
-    std::vector<double> m_dxy;    // d^2f/dxdy
+    std::vector<double> m_dxy;    // d^2f/dxdy(точные)
     // Коэффициенты метода 3
-    std::vector<double> m_c3;
-    std::vector<double> m_adx;     // для метода 3 апрокс производные
-    std::vector<double> m_ady;
-    std::vector<double> m_adxy; 
+    //std::vector<double> m_c3;
+    std::vector<double> m_a3dx;     // для метода 3 апрокс производные
+    std::vector<double> m_a3dy;
+    std::vector<double> m_a3dxy; 
 
     // Коэффициенты метода 31 (кусочный кубический)
-    std::vector<double> m_c31;
+    //std::vector<double> m_c4;
+    std::vector<double> m_a4dx;     // для метода 4 апрокс производные
+    std::vector<double> m_a4dy;
+    std::vector<double> m_a4dxy;
+    // Коэффициенты метода 5
+    //std::vector<double> m_c5;
+    /*Не нужны производные-Уже посчитаны точные производные*/
+
+    //Коэф метода 6
+    std::vector<double> m_c6; //Коэф метода 6
+                            //Метод не требуе производных
 
     void initGrid();
 };

@@ -2,6 +2,8 @@
 #include "func.h"
 #include "task3.h"
 #include "task31.h"
+#include "task5.h"
+#include "task6.h"
 #include <cmath>
 #include <algorithm>
 
@@ -12,17 +14,29 @@ Approximator2D::Approximator2D(double a, double b, double c, double d,
     , m_k(k), m_p(0), m_scale(0), m_graphMode(0), m_angle(0.0)
     , m_maxAbsF(0.0)
 {
+    //сетка для методов 3,4,5
     m_x.resize(m_nx);
     m_y.resize(m_ny);
     m_f.resize(m_nx*m_ny);
+    //точные производные
     m_dx.resize(m_nx*m_ny);
     m_dy.resize(m_nx*m_ny);
     m_dxy.resize(m_nx*m_ny);
-    m_adx.resize(m_nx*m_ny);
-    m_ady.resize(m_nx*m_ny);
-    m_adxy.resize(m_nx*m_ny);
-    m_c3.resize(16*(m_nx-1)*(m_ny-1), 0.0);
-    m_c31.resize(16*(m_nx-1)*(m_ny-1),0.0);
+    //3
+    m_a3dx.resize(m_nx*m_ny);
+    m_a3dy.resize(m_nx*m_ny);
+    m_a3dxy.resize(m_nx*m_ny);
+    //m_c3.resize(16*(m_nx-1)*(m_ny-1), 0.0);
+    //4
+    m_a4dx.resize(m_nx*m_ny);
+    m_a4dy.resize(m_nx*m_ny);
+    m_a4dxy.resize(m_nx*m_ny);
+    //m_c4.resize(16*(m_nx-1)*(m_ny-1),0.0);
+    //5
+    //m_c5.resize(16*(m_nx-1)*(m_ny-1),0.0);
+    //6
+    m_c6.resize((m_nx)*(m_ny),0.0);
+
     initGrid();
 }
 
@@ -39,14 +53,17 @@ void Approximator2D::initGrid()
     }
     // значения функции//
     m_f.resize(m_nx * m_ny);
+    m_dx.resize(m_nx * m_ny);
+    m_dy.resize(m_nx * m_ny);
+    m_dxy.resize(m_nx * m_ny);
     m_maxAbsF = 0.0;
     for (int i = 0; i < m_nx; i++) {
         for (int j = 0; j < m_ny; j++) {
             double v = GetExactValue(m_x[i], m_y[j], m_k);
             m_f[i * m_ny + j] = v;
-            //m_dx[i*m_ny+j]= GetDX(m_x[i], m_y[j], m_k);
-            //m_dy[i*m_ny+j]= GetDY(m_x[i], m_y[j], m_k);
-            //m_dxy[i*m_ny+j]= GetDXY(m_x[i], m_y[j], m_k);
+            m_dx[i*m_ny+j]= GetDX(m_x[i], m_y[j], m_k);
+            m_dy[i*m_ny+j]= GetDY(m_x[i], m_y[j], m_k);
+            m_dxy[i*m_ny+j]= GetDXY(m_x[i], m_y[j], m_k);
             m_maxAbsF = std::max(m_maxAbsF, std::fabs(v));
         }
     }
@@ -62,12 +79,60 @@ void Approximator2D::initGrid()
 void Approximator2D::rebuild()
 {
     initGrid();
-    computeAllDerivatives(m_nx,m_ny, m_x,m_y,m_f,m_adx, m_ady,m_adxy);
-    computeAllDerivatives31(m_nx,m_ny, m_x,m_y,m_f,m_dx, m_dy,m_dxy);
+    m_a3dx.resize(m_nx*m_ny);
+    m_a3dy.resize(m_nx*m_ny);
+    m_a3dxy.resize(m_nx*m_ny);
+    m_a4dx.resize(m_nx*m_ny);
+    m_a4dy.resize(m_nx*m_ny);
+    m_a4dxy.resize(m_nx*m_ny);
+    m_c6.resize((m_nx)*(m_ny),0.0);
+
+    computeAllDerivatives(m_nx,m_ny, m_x,m_y,m_f,m_a3dx, m_a3dy,m_a3dxy);
+    computeAllDerivatives31(m_nx,m_ny, m_x,m_y,m_f,m_a4dx, m_a4dy,m_a4dxy);
+    //Пересчет точных производных для task5 уже произошел в initGrid();
+    auto exact = [this](double x, double y) { return this->f(x, y); };
+    GetCoefficients6(m_nx,m_ny,m_a,m_b,m_c,m_d,exact,m_c6);
+
+
+}
+double Approximator2D::getMaxError1() const
+{
+    if (m_nx < 2 || m_ny<2) return -1.0;
+    return maxAbsoluteErrorParallel(m_x[0], m_x[m_nx-1],m_y[0], m_y[m_ny-1],
+        [this](double x, double y) { return this->f(x,y); },
+        [this](double x, double y) { return this->approx1(x,y); });
+}
+double Approximator2D::getMaxError2() const
+{
+    if (m_nx < 2 || m_ny<2) return -1.0;
+    return maxAbsoluteErrorParallel(m_x[0], m_x[m_nx-1],m_y[0], m_y[m_ny-1],
+        [this](double x, double y) { return this->f(x,y); },
+        [this](double x, double y) { return this->approx2(x,y); });
+}
+double Approximator2D::getMaxError3() const
+{
+    if (m_nx < 2 || m_ny<2) return -1.0;
+    return maxAbsoluteErrorParallel(m_x[0], m_x[m_nx-1],m_y[0], m_y[m_ny-1],
+        [this](double x, double y) { return this->f(x,y); },
+        [this](double x, double y) { return this->approx3(x,y); });
+}
+double Approximator2D::getMaxError4() const
+{
+    if (m_nx < 2 || m_ny<2) return -1.0;
+    return maxAbsoluteErrorParallel(m_x[0], m_x[m_nx-1],m_y[0], m_y[m_ny-1],
+        [this](double x, double y) { return this->f(x,y); },
+        [this](double x, double y) { return this->approx4(x,y); });
 }
 
-void Approximator2D::setNx(int nx) { m_nx = std::max(2, nx); }
-void Approximator2D::setNy(int ny) { m_ny = std::max(2, ny); }
+void Approximator2D::setNx(int nx) { m_nx = std::max(2, nx);
+
+}
+void Approximator2D::setNy(int ny) { m_ny = std::max(2, ny);
+    
+    
+
+
+}
 
 void Approximator2D::nextK()
 {
@@ -104,13 +169,22 @@ double Approximator2D::f(double x, double y) const
 
 double Approximator2D::approx1(double x, double y) const
 {
-    return GetValue13(x,y,m_x,m_nx,m_y, m_ny,m_f,m_adx,m_ady,m_adxy);
+    return GetValue13(x,y,m_x,m_nx,m_y, m_ny,m_f,m_a3dx,m_a3dy,m_a3dxy);
 }
 
 double Approximator2D::approx2(double x, double y) const
 {
-    return GetValue31(x, y,m_x,m_nx,m_y, m_ny,m_f,m_dx,m_dy,m_dxy );
+    return GetValue31(x,y,m_x,m_nx,m_y, m_ny,m_f,m_a4dx,m_a4dy,m_a4dxy);
 }
+double Approximator2D::approx3(double x, double y) const
+{
+    return GetValue5(x, y,m_x,m_nx,m_y, m_ny,m_f,m_dx,m_dy,m_dxy );
+}
+double Approximator2D::approx4(double x, double y) const
+{
+    return GetValue6(x,y,m_a,m_b,m_c,m_d,m_c6,m_nx,m_ny);
+}
+
 std::function<double(double, double)> Approximator2D::getPlotFunc() const
 {
     switch (m_graphMode) {
@@ -133,9 +207,9 @@ QString Approximator2D::getPlotName() const
 {
     switch (m_graphMode) {
     case 0: return "f(x,y)";
-    case 1: return "Approx1 (Newton)";
+    case 1: return "Approx1";
     case 2: return "Error1 = P1-f";
-    case 3: return "Approx2 (PieceCubic)";
+    case 3: return "Approx2";
     case 4: return "Error2 = P2-f";
     default: return "";
     }

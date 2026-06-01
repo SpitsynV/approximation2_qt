@@ -124,34 +124,36 @@ double GetValue6(double x, double y,
                  const std::vector<double>& coeffs,
                  int nx, int ny)
 {
-    // Приведение координат к отрезку [-1,1]
+    // Нормировка координат в [-1,1]
     double xi = 2.0 * (x - a) / (b - a) - 1.0;
     double eta = 2.0 * (y - c) / (d - c) - 1.0;
     xi = std::max(-1.0, std::min(1.0, xi));
     eta = std::max(-1.0, std::min(1.0, eta));
 
-    // Предвычисление многочленов Чебышева T_i(xi) и T_j(eta)
     std::vector<double> Txi(nx), Teta(ny);
-    auto cheb = [](int n, double t) -> double {
-        if (n == 0) return 1.0;
-        if (n == 1) return t;
-        double t0 = 1.0, t1 = t;
-        for (int k = 2; k <= n; ++k) {
-            double t2 = 2.0 * t * t1 - t0;
-            t0 = t1;
-            t1 = t2;
-        }
-        return t1;
-    };
-    for (int i = 0; i < nx; ++i) Txi[i] = cheb(i, xi);
-    for (int j = 0; j < ny; ++j) Teta[j] = cheb(j, eta);
 
+    // Txi
+    if (nx > 0) Txi[0] = 1.0;
+    if (nx > 1) Txi[1] = xi;
+    for (int i = 2; i < nx; ++i) {
+        Txi[i] = 2.0 * xi * Txi[i-1] - Txi[i-2];
+    }
+
+    // Teta
+    if (ny > 0) Teta[0] = 1.0;
+    if (ny > 1) Teta[1] = eta;
+    for (int j = 2; j < ny; ++j) {
+        Teta[j] = 2.0 * eta * Teta[j-1] - Teta[j-2];
+    }
+
+    // Двойная сумма по тензорному произведению
     double result = 0.0;
     for (int i = 0; i < nx; ++i) {
         double row_sum = 0.0;
         const double* row = &coeffs[i * ny];
-        for (int j = 0; j < ny; ++j)
+        for (int j = 0; j < ny; ++j) {
             row_sum += row[j] * Teta[j];
+        }
         result += Txi[i] * row_sum;
     }
     return result;

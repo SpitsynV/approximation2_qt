@@ -4,6 +4,8 @@
 #include <cmath>
 #include <cstdio>
 #include <algorithm>
+#include <chrono>
+#include "approximator2d.h"
 
 PlotWidget2D::PlotWidget2D(Approximator2D *approx, QWidget *parent)
     : QWidget(parent), m_approx(approx), m_lastMaxAbs(-1.0)
@@ -102,7 +104,7 @@ void PlotWidget2D::paintEvent(QPaintEvent *)
     double cx = width()  * 0.5;
     double cy = height() * 0.55;
 
-    // ── Каркасная отрисовка поверхности ───────────────────────────────
+    // ── отрисовка поверхности ───────────────────────────────
     painter.setPen(QPen(Qt::blue, 1));
 
     // линии вдоль x (при фиксированном j)
@@ -164,10 +166,56 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     {
     //const auto &x = m_approx->getX();
     //const auto &f = m_approx->getF();
-    //fprintf(stderr, "=== Debug: n=%d, a=%.6f, b=%.6f ===\n", m_approx->n(), m_approx->a(), m_approx->b());
-    
-    //fprintf(stderr, "Max error method 1 = %e\n", m_approx->getMaxError1());
-    //fprintf(stderr, "Max error method 2 = %e\n", m_approx->getMaxError2());
+    fprintf(stderr, "=== Debug: nx=%d,ny=%d, a=%.6f, b=%.6f, c=%.6f, d=%.6f ===\n", m_approx->nx(), m_approx->ny(), m_approx->a(), m_approx->b(), m_approx->c(), m_approx->d());
+    /*   Время   */
+    /*
+    double px = 1;
+    double py = -1;
+    std::chrono::duration<double> elapsed;
+    auto start = std::chrono::high_resolution_clock::now();
+    double val = m_approx->approx1(px, py);
+    auto end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time taken 1 method: %e seconds\n", elapsed.count());
+    start = std::chrono::high_resolution_clock::now();
+    val = m_approx->approx2(px, py);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time taken 2 method: %e seconds\n", elapsed.count());
+    start = std::chrono::high_resolution_clock::now();
+    val = m_approx->approx3(px, py);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time taken 3 method: %e seconds\n", elapsed.count());  
+    start = std::chrono::high_resolution_clock::now();
+    val = m_approx->approx4(px, py);
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time taken 4 method: %e seconds\n", elapsed.count());  
+    */
+    /*      Погрешность         */
+    std::chrono::duration<double> elapsed;
+    auto start = std::chrono::high_resolution_clock::now();
+    fprintf(stderr, "Max error method 1 = %e\n", m_approx->getMaxError1());
+    auto end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time err 1: %e seconds\n", elapsed.count());
+    start = std::chrono::high_resolution_clock::now();
+    fprintf(stderr, "Max error method 2 = %e\n", m_approx->getMaxError2());
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time err 2: %e seconds\n", elapsed.count());
+    start = std::chrono::high_resolution_clock::now();
+    fprintf(stderr, "Max error method 3 = %e\n", m_approx->getMaxError3());
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time err 3: %e seconds\n", elapsed.count());
+    start = std::chrono::high_resolution_clock::now();
+    fprintf(stderr, "Max error method 4 = %e\n", m_approx->getMaxError4());
+    end = std::chrono::high_resolution_clock::now();
+    elapsed = end - start;
+    fprintf(stderr, "Time err 4: %e seconds\n", elapsed.count());
+
     // не меняем состояние и не перерисовываем
     return;
     }

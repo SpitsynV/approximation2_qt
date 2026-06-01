@@ -99,7 +99,7 @@ void computeAllDerivatives31(int nx, int ny,
             dy[i * ny + j] = d_row[j];
     }
 
-    // Смешанные производные (∂/∂x от dy)
+    // Смешанные производные 
     std::vector<double> dy_col(nx);
     std::vector<double> dxy_col(nx);
     for (int j = 0; j < ny; ++j) {
@@ -124,39 +124,45 @@ double GetValue31(double px, double py,
                   const std::vector<double>& dy,
                   const std::vector<double>& dxy)
 {
-    // Поиск отрезка по x
+    // 1. Поиск отрезка по x
     int ix = std::lower_bound(x.begin(), x.end(), px) - x.begin();
     if (ix == 0) ix = 0;
     else if (ix == nx) ix = nx - 2;
     else ix = ix - 1;
-    ix = std::max(0, std::min(nx-2, ix));
-    double x0 = x[ix], x1 = x[ix+1];
+    ix = std::max(0, std::min(nx - 2, ix));
+    double x0 = x[ix], x1 = x[ix + 1];
 
-    // Интерполяция по x для каждого y_j
-    std::vector<double> F_j(ny), Fy_j(ny);
-    for (int j = 0; j < ny; ++j) {
-        double y0 = f_vals[ix * ny + j];
-        double y1 = f_vals[(ix+1) * ny + j];
-        double dy0 = dx[ix * ny + j];
-        double dy1 = dx[(ix+1) * ny + j];
-        F_j[j] = hermiteInterp1D(x0, x1, y0, y1, dy0, dy1, px);
-
-        double z0 = dy[ix * ny + j];
-        double z1 = dy[(ix+1) * ny + j];
-        double dz0 = dxy[ix * ny + j];
-        double dz1 = dxy[(ix+1) * ny + j];
-        Fy_j[j] = hermiteInterp1D(x0, x1, z0, z1, dz0, dz1, px);
-    }
-
-    // Интерполяция по y
+    // 2. Поиск отрезка по y 
     int iy = std::lower_bound(y.begin(), y.end(), py) - y.begin();
     if (iy == 0) iy = 0;
     else if (iy == ny) iy = ny - 2;
     else iy = iy - 1;
-    iy = std::max(0, std::min(ny-2, iy));
-    double y0 = y[iy], y1 = y[iy+1];
-    double v0 = F_j[iy], v1 = F_j[iy+1];
-    double dv0 = Fy_j[iy], dv1 = Fy_j[iy+1];
+    iy = std::max(0, std::min(ny - 2, iy));
+    double y0 = y[iy], y1 = y[iy + 1];
 
+    // 3. Интерполяция по x только для нужных j
+    int idx00 = ix * ny + iy;         
+    int idx10 = (ix + 1) * ny + iy;   
+
+    double v0 = hermiteInterp1D(x0, x1,
+        f_vals[idx00], f_vals[idx10],
+        dx[idx00], dx[idx10], px);
+
+    double dv0 = hermiteInterp1D(x0, x1,
+        dy[idx00], dy[idx10],
+        dxy[idx00], dxy[idx10], px);
+
+    int idx01 = ix * ny + iy + 1;
+    int idx11 = (ix + 1) * ny + iy + 1;
+
+    double v1 = hermiteInterp1D(x0, x1,
+        f_vals[idx01], f_vals[idx11],
+        dx[idx01], dx[idx11], px);
+
+    double dv1 = hermiteInterp1D(x0, x1,
+        dy[idx01], dy[idx11],
+        dxy[idx01], dxy[idx11], px);
+
+    // 4. Финальная интерполяция по y
     return hermiteInterp1D(y0, y1, v0, v1, dv0, dv1, py);
 }
