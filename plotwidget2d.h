@@ -1,6 +1,13 @@
 #pragma once
 #include <QWidget>
+#include <QVector>
+#include <QLabel>
+#include <QPushButton>
 #include "approximator2d.h"
+#include "parallel_runner.h"
+#include "method_result.h"
+#include <QLabel>
+#include <QPushButton>
 
 class PlotWidget2D : public QWidget
 {
@@ -14,6 +21,8 @@ protected:
     void paintEvent(QPaintEvent *) override;
     void keyPressEvent(QKeyEvent *event) override;
 
+    void resizeEvent(QResizeEvent *e);
+
 private:
     Approximator2D *m_approx;
     double m_lastMaxAbs;
@@ -24,4 +33,16 @@ private:
                     double cx, double cy,
                     double scaleXY, double scaleZ,
                     double xmid, double ymid, double zmid) const;
+    
+
+
+    //
+
+    // ── Параллельный запуск ──────────────────────────────────────
+    ParallelRunner* m_runner       = nullptr;
+    QLabel*         m_resultsLabel = nullptr;  // панель результатов
+    QPushButton*    m_runBtn       = nullptr;  // кнопка "Сравнить методы"
+    private slots:
+    void onRunParallel();
+    void onResultsReady(QVector<MethodResult> results, int bestIdx);
 };

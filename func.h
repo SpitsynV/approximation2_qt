@@ -1,6 +1,6 @@
 #pragma once
 
-// f(x,y) по номеру k=0..7 (требование 2)
+// f(x,y) по номеру k=0..7
 double GetExactValue(double x, double y, int k);
 double GetDX(double x, double y, int k);
 double GetDY(double x, double y, int k);

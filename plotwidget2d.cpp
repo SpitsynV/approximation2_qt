@@ -1,16 +1,48 @@
 #include "plotwidget2d.h"
 #include <QPainter>
 #include <QKeyEvent>
+#include <QResizeEvent>
 #include <cmath>
 #include <cstdio>
 #include <algorithm>
 #include <chrono>
 #include "approximator2d.h"
+#include "method_selector.h"
+#include "method_result.h"
+#include <QVector>
+#include <QLabel>
+#include <QPushButton>
 
 PlotWidget2D::PlotWidget2D(Approximator2D *approx, QWidget *parent)
     : QWidget(parent), m_approx(approx), m_lastMaxAbs(-1.0)
 {
     setFocusPolicy(Qt::StrongFocus);
+    // ── Инициализация параллельного бенчмарка ────────────────────
+    m_runner = new ParallelRunner(this);
+    connect(m_runner, &ParallelRunner::resultsReady,
+            this,     &PlotWidget2D::onResultsReady,
+            Qt::QueuedConnection);   // явно: сигнал из фонового потока
+
+    // Кнопка в правом верхнем углу
+    m_runBtn = new QPushButton(QStringLiteral("▶ Сравнить методы"), this);
+    m_runBtn->setGeometry(width() - 190, 10, 180, 30);
+    m_runBtn->setStyleSheet(
+        "QPushButton{background:#2d5a8e;color:white;border-radius:4px;font-size:12px}"
+        "QPushButton:hover{background:#3d7abf}"
+        "QPushButton:disabled{background:#888}"
+    );
+    connect(m_runBtn, &QPushButton::clicked, this, &PlotWidget2D::onRunParallel);
+
+    // Метка с результатами — скрыта до первого запуска
+    m_resultsLabel = new QLabel(this);
+    m_resultsLabel->setTextFormat(Qt::RichText);
+    m_resultsLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    m_resultsLabel->setStyleSheet(
+        "QLabel{background:rgba(255,255,255,220);border:1px solid #aaa;"
+        "border-radius:4px;padding:6px;font-size:12px}"
+    );
+    m_resultsLabel->move(10, 10);
+    m_resultsLabel->hide();
 }
 
 QSize PlotWidget2D::minimumSizeHint() const { return QSize(400, 300); }
@@ -41,7 +73,8 @@ void PlotWidget2D::paintEvent(QPaintEvent *)
 {
     if (!m_approx) return;
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, false);  // быстрее без AA
+    painter.setRenderHint(QPainter::Antialiasing, false); 
+
 
     auto plotFunc = m_approx->getPlotFunc();
 
@@ -152,6 +185,7 @@ void PlotWidget2D::paintEvent(QPaintEvent *)
         .arg(m_approx->getPlotName())
         .arg(maxAbs, 0, 'g', 4);
     painter.drawText(10, 20, info);
+    
 }
 
 void PlotWidget2D::keyPressEvent(QKeyEvent *event)
@@ -194,6 +228,7 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     fprintf(stderr, "Time taken 4 method: %e seconds\n", elapsed.count());  
     */
     /*      Погрешность         */
+    /*
     std::chrono::duration<double> elapsed;
     auto start = std::chrono::high_resolution_clock::now();
     fprintf(stderr, "Max error method 1 = %e\n", m_approx->getMaxError1());
@@ -215,7 +250,7 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     end = std::chrono::high_resolution_clock::now();
     elapsed = end - start;
     fprintf(stderr, "Time err 4: %e seconds\n", elapsed.count());
-
+        */
     // не меняем состояние и не перерисовываем
     return;
     }
@@ -294,4 +329,35 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
 
     m_lastMaxAbs = -1.0;  // принудительно выводим max|F| при следующей отрисовке
     update();
+}
+void PlotWidget2D::resizeEvent(QResizeEvent* e)
+{
+    QWidget::resizeEvent(e);
+    if (m_runBtn)
+        m_runBtn->move(width() - 190, 10);
+}
+void PlotWidget2D::onRunParallel()
+{
+    m_runBtn->setEnabled(false);
+    m_runBtn->setText(QStringLiteral("⏳ Считаем..."));
+    m_resultsLabel->hide();
+
+    // rebuild гарантирует актуальность данных перед снятием снимка
+    m_approx->rebuild();
+    m_runner->runAllAsync(m_approx->extractSharedInput());
+}
+
+void PlotWidget2D::onResultsReady(QVector<MethodResult> results, int bestIdx)
+{
+    m_runBtn->setEnabled(true);
+    m_runBtn->setText(QStringLiteral("▶ Сравнить методы"));
+
+    // Показываем таблицу
+    const QString html = MethodSelector::toHtmlTable(results, bestIdx);
+    m_resultsLabel->setText(html);
+    m_resultsLabel->adjustSize();
+    m_resultsLabel->show();
+    m_resultsLabel->raise();
+
+    update(); // перерисовать виджет
 }

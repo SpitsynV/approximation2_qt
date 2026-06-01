@@ -214,3 +214,21 @@ QString Approximator2D::getPlotName() const
     default: return "";
     }
 }
+//
+SharedInputData Approximator2D::extractSharedInput() const
+{
+    SharedInputData d;
+    d.a  = m_a;  d.b  = m_b;
+    d.c  = m_c;  d.d  = m_d;
+    d.nx = m_nx; d.ny = m_ny;
+    d.mx = m_mx; d.my = m_my;
+    d.k  = m_k;
+    d.maxAbsF = m_maxAbsF;
+    d.x   = m_x;
+    d.y   = m_y;
+    d.f   = m_f;
+    d.dx  = m_dx;
+    d.dy  = m_dy;
+    d.dxy = m_dxy;
+    return d;
+}

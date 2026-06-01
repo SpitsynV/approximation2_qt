@@ -3,7 +3,7 @@
 #include "approximator2d.h"
 #include <iostream>
 #include <cstdlib>
-
+#include "method_result.h"
 int main(int argc, char *argv[])
 {
     if (argc < 10) {
@@ -23,12 +23,15 @@ int main(int argc, char *argv[])
     int    k  = std::stoi(argv[9]);
 
     QApplication app(argc, argv);
+    qRegisterMetaType<MethodResult>("MethodResult");
+    qRegisterMetaType<QVector<MethodResult>>("QVector<MethodResult>");
 
     Approximator2D approx(a, b, c, d, nx, ny, mx, my, k);
 
     PlotWidget2D plot(&approx);
     plot.setWindowTitle("Approx 2D ");
     plot.show();
+    qRegisterMetaType<QVector<MethodResult>>();
 
     return app.exec();
 }
