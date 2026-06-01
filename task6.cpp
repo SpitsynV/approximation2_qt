@@ -124,37 +124,41 @@ double GetValue6(double x, double y,
                  const std::vector<double>& coeffs,
                  int nx, int ny)
 {
-    // Нормировка координат в [-1,1]
+    // Нормировка координат
     double xi = 2.0 * (x - a) / (b - a) - 1.0;
     double eta = 2.0 * (y - c) / (d - c) - 1.0;
     xi = std::max(-1.0, std::min(1.0, xi));
     eta = std::max(-1.0, std::min(1.0, eta));
 
-    std::vector<double> Txi(nx), Teta(ny);
-
-    // Txi
-    if (nx > 0) Txi[0] = 1.0;
-    if (nx > 1) Txi[1] = xi;
-    for (int i = 2; i < nx; ++i) {
-        Txi[i] = 2.0 * xi * Txi[i-1] - Txi[i-2];
-    }
-
-    // Teta
+    // Однократное вычисление Teta (требуется для всех строк)
+    std::vector<double> Teta(ny);
     if (ny > 0) Teta[0] = 1.0;
     if (ny > 1) Teta[1] = eta;
     for (int j = 2; j < ny; ++j) {
         Teta[j] = 2.0 * eta * Teta[j-1] - Teta[j-2];
     }
 
-    // Двойная сумма по тензорному произведению
     double result = 0.0;
+
+    // Рекуррентное вычисление Txi во внешнем цикле
+    double Ti   = 1.0;           // T_0
+    double Tip1 = (nx > 1) ? xi : 0.0; // T_1
+
     for (int i = 0; i < nx; ++i) {
+        // Используем текущий Ti
         double row_sum = 0.0;
         const double* row = &coeffs[i * ny];
         for (int j = 0; j < ny; ++j) {
             row_sum += row[j] * Teta[j];
         }
-        result += Txi[i] * row_sum;
+        result += Ti * row_sum;
+
+        // Переход к следующему Ti (T_{i+1})
+        if (i + 1 < nx) {
+            double next = 2.0 * xi * Tip1 - Ti;
+            Ti = Tip1;
+            Tip1 = next;
+        }
     }
     return result;
 }
