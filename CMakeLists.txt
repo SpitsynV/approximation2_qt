@@ -16,6 +16,7 @@ add_executable(approx2d
     plotwidget2d.cpp    plotwidget2d.h
     error.cpp   error.h
     task5.cpp
+    task6.cpp
 )
 
 target_link_libraries(approx2d Qt5::Widgets)
