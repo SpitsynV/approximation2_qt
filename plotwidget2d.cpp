@@ -211,7 +211,7 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     elapsed = end - start;
     fprintf(stderr, "Time err 3: %e seconds\n", elapsed.count());
     start = std::chrono::high_resolution_clock::now();
-    fprintf(stderr, "Max error method 4 = %e\n", m_approx->getMaxError4());
+    fprintf(stderr, "Int error method 4 = %e\n", m_approx->getError4());
     end = std::chrono::high_resolution_clock::now();
     elapsed = end - start;
     fprintf(stderr, "Time err 4: %e seconds\n", elapsed.count());

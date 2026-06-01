@@ -95,3 +95,30 @@ double maxAbsoluteErrorParallel(double a, double b, double c, double d,
 
     return globalMax;
 }
+double integralError2D(
+    double a, double b, double c, double d,
+    const std::function<double(double,double)> &exactFunc2D,
+    const std::function<double(double,double)> &approxFunc2D,
+    int Nx, int Ny)  // число узлов по каждой переменной (чётные для Симпсона)
+{
+    double midX = (a + b) / 2.0, halfX = (b - a) / 2.0;
+    double midY = (c + d) / 2.0, halfY = (d - c) / 2.0;
+    double hx = M_PI / Nx, hy = M_PI / Ny;
+    double sum = 0.0;
+
+    for (int i = 0; i <= Nx; ++i) {
+        double theta = i * hx;
+        double x = midX + halfX * cos(theta);
+        double wx = (i == 0 || i == Nx) ? 1.0 : (i % 2 == 0 ? 2.0 : 4.0);
+
+        for (int j = 0; j <= Ny; ++j) {
+            double phi = j * hy;
+            double y = midY + halfY * cos(phi);
+            double wy = (j == 0 || j == Ny) ? 1.0 : (j % 2 == 0 ? 2.0 : 4.0);
+
+            double diff = exactFunc2D(x, y) - approxFunc2D(x, y);
+            sum += wx * wy * diff * diff;
+        }
+    }
+    return std::sqrt(hx * hy / 9.0 * sum);   // (hx/3)*(hy/3) = hx*hy/9
+}

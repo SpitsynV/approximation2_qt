@@ -116,10 +116,10 @@ double Approximator2D::getMaxError3() const
         [this](double x, double y) { return this->f(x,y); },
         [this](double x, double y) { return this->approx3(x,y); });
 }
-double Approximator2D::getMaxError4() const
+double Approximator2D::getError4() const
 {
     if (m_nx < 2 || m_ny<2) return -1.0;
-    return maxAbsoluteErrorParallel(m_x[0], m_x[m_nx-1],m_y[0], m_y[m_ny-1],
+    return integralError2D(m_x[0], m_x[m_nx-1],m_y[0], m_y[m_ny-1],
         [this](double x, double y) { return this->f(x,y); },
         [this](double x, double y) { return this->approx4(x,y); });
 }

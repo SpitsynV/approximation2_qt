@@ -25,7 +25,7 @@ public:
     double getMaxError1() const;
     double getMaxError2() const;
     double getMaxError3() const;
-    double getMaxError4() const;
+    double getError4() const;
 
     // Геттеры
     double a() const { return m_a; }
