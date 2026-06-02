@@ -9,24 +9,23 @@ ParallelRunner::ParallelRunner(QObject* parent)
     : QObject(parent)
 {}
 
-// ─── Синхронный запуск ────────────────────────────────────────────────────────
 QVector<MethodResult> ParallelRunner::runAll(const SharedInputData& input, int& bestIdx)
 {
-    constexpr int kNumMethods = 4;
+    const int kNumMethods = 4;
 
-    // Создаём runner-ы заранее, чтобы ссылки в лямбдах оставались валидными
+    //Только так
     std::vector<MethodRunner> runners;
     runners.reserve(kNumMethods);
     for (int id = 1; id <= kNumMethods; ++id)
         runners.emplace_back(id, input);
 
-    // Запускаем 4 потока
+    // Запуск потоков
     std::vector<std::thread> threads;
     threads.reserve(kNumMethods);
     for (auto& runner : runners)
         threads.emplace_back([&runner]{ runner.run(); });
 
-    // Ждём завершения всех
+    // Ждём всех
     for (auto& t : threads)
         t.join();
 
@@ -36,15 +35,13 @@ QVector<MethodResult> ParallelRunner::runAll(const SharedInputData& input, int& 
     for (const auto& r : runners)
         results.push_back(r.result());
 
-    // Вычисляем score и выбираем победителя
     bestIdx = MethodSelector::selectBest(results);
     return results;
 }
 
-// ─── Асинхронный запуск ───────────────────────────────────────────────────────
 void ParallelRunner::runAllAsync(const SharedInputData& input)
 {
-    // Копируем данные — Approximator2D можно менять сразу после возврата
+    // Копируем данные — Approximator2D может потом изменится
     SharedInputData inputCopy = input;
 
     // Координирующий поток: запускает 4 рабочих, ждёт, испускает сигнал
@@ -52,10 +49,10 @@ void ParallelRunner::runAllAsync(const SharedInputData& input)
         int bestIdx = -1;
         QVector<MethodResult> results = this->runAll(inputCopy, bestIdx);
 
-        // Вывод в консоль (из любого потока — cout thread-safe)
+        // Вывод в консоль (из любого потока)
         MethodSelector::printResults(results, bestIdx);
-
-        // emit из non-main thread: Qt сам доставит через QueuedConnection
+        
+        // emit из non-main thread: Qt сам обработает как надо и доставит
         emit resultsReady(results, bestIdx);
     }).detach();
 }

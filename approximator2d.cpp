@@ -230,5 +230,7 @@ SharedInputData Approximator2D::extractSharedInput() const
     d.dx  = m_dx;
     d.dy  = m_dy;
     d.dxy = m_dxy;
+
+    d.func = [this](double x, double y) { return this->f(x, y); };
     return d;
 }

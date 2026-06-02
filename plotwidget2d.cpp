@@ -24,7 +24,7 @@ PlotWidget2D::PlotWidget2D(Approximator2D *approx, QWidget *parent)
             Qt::QueuedConnection);   // явно: сигнал из фонового потока
 
     // Кнопка в правом верхнем углу
-    m_runBtn = new QPushButton(QStringLiteral("▶ Сравнить методы"), this);
+    m_runBtn = new QPushButton(QStringLiteral("Сравнить методы"), this);
     m_runBtn->setGeometry(width() - 190, 10, 180, 30);
     m_runBtn->setStyleSheet(
         "QPushButton{background:#2d5a8e;color:white;border-radius:4px;font-size:12px}"
@@ -33,7 +33,7 @@ PlotWidget2D::PlotWidget2D(Approximator2D *approx, QWidget *parent)
     );
     connect(m_runBtn, &QPushButton::clicked, this, &PlotWidget2D::onRunParallel);
 
-    // Метка с результатами — скрыта до первого запуска
+    // Табло с результатами — скрыта до первого запуска
     m_resultsLabel = new QLabel(this);
     m_resultsLabel->setTextFormat(Qt::RichText);
     m_resultsLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -41,19 +41,15 @@ PlotWidget2D::PlotWidget2D(Approximator2D *approx, QWidget *parent)
         "QLabel{background:rgba(255,255,255,220);border:1px solid #aaa;"
         "border-radius:4px;padding:6px;font-size:12px}"
     );
-    m_resultsLabel->move(10, 10);
+    m_resultsLabel->move(PlotWidget2D::width(), PlotWidget2D::height());
     m_resultsLabel->hide();
 }
 
 QSize PlotWidget2D::minimumSizeHint() const { return QSize(400, 300); }
 QSize PlotWidget2D::sizeHint()        const { return QSize(800, 600); }
 
-// Проекция мирового (xw,yw,zw) → экранное (u,v).
-// Вращение вокруг OZ на угол theta, затем косоугольная проекция:
-//   xr = (xw-xmid)*cos(θ) - (yw-ymid)*sin(θ)
-//   yr = (xw-xmid)*sin(θ) + (yw-ymid)*cos(θ)
-//   u  = cx + scaleXY * xr - 0.5*scaleXY * yr
-//   v  = cy - scaleZ  * (zw-zmid) - 0.4*scaleXY * yr
+// Проекция исх (xw,yw,zw) → экранные (u,v).
+// Вращение вокруг OZ на угол theta, затем проекция:
 QPointF PlotWidget2D::project(double xw, double yw, double zw,
                               double cx, double cy,
                               double scaleXY, double scaleZ,
@@ -335,14 +331,17 @@ void PlotWidget2D::resizeEvent(QResizeEvent* e)
     QWidget::resizeEvent(e);
     if (m_runBtn)
         m_runBtn->move(width() - 190, 10);
+    if (m_resultsLabel && !m_resultsLabel->isHidden()) {
+        m_resultsLabel->move(width() - m_resultsLabel->width(),
+                             height() - m_resultsLabel->height());
+    }
 }
 void PlotWidget2D::onRunParallel()
 {
     m_runBtn->setEnabled(false);
-    m_runBtn->setText(QStringLiteral("⏳ Считаем..."));
+    m_runBtn->setText(QStringLiteral("Считаем..."));
     m_resultsLabel->hide();
 
-    // rebuild гарантирует актуальность данных перед снятием снимка
     m_approx->rebuild();
     m_runner->runAllAsync(m_approx->extractSharedInput());
 }
@@ -350,9 +349,9 @@ void PlotWidget2D::onRunParallel()
 void PlotWidget2D::onResultsReady(QVector<MethodResult> results, int bestIdx)
 {
     m_runBtn->setEnabled(true);
-    m_runBtn->setText(QStringLiteral("▶ Сравнить методы"));
+    m_runBtn->setText(QStringLiteral("Сравнить методы"));
 
-    // Показываем таблицу
+    // Показать таблицу
     const QString html = MethodSelector::toHtmlTable(results, bestIdx);
     m_resultsLabel->setText(html);
     m_resultsLabel->adjustSize();

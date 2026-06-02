@@ -12,7 +12,6 @@ int MethodSelector::selectBest(QVector<MethodResult>& results)
     if (results.isEmpty())
         return -1;
 
-    // Собираем максимумы для нормировки (только по валидным результатам)
     double maxErr  = std::numeric_limits<double>::min();
     double maxTime = std::numeric_limits<double>::min();
 
@@ -22,7 +21,7 @@ int MethodSelector::selectBest(QVector<MethodResult>& results)
         maxTime = std::max(maxTime, r.elapsedMs);
     }
 
-    // Защита от вырождения (все ошибки одинаковы или равны нулю)
+    // Защита
     if (maxErr  < 1e-300) maxErr  = 1.0;
     if (maxTime < 1e-300) maxTime = 1.0;
 
@@ -37,7 +36,7 @@ int MethodSelector::selectBest(QVector<MethodResult>& results)
         r.score = kAlpha * normErr + (1.0 - kAlpha) * normTime;
     }
 
-    // Находим индекс минимального score среди валидных
+    // Находим индекс лучшего метода (минимальный score)
     int bestIdx = -1;
     double bestScore = std::numeric_limits<double>::max();
     for (int i = 0; i < results.size(); ++i) {
@@ -48,55 +47,8 @@ int MethodSelector::selectBest(QVector<MethodResult>& results)
     }
     return bestIdx;
 }
-
 // ─────────────────────────────────────────────────────────────────────────────
-
-void MethodSelector::printResults(const QVector<MethodResult>& results, int bestIdx)
-{
-    using std::cout;
-    using std::setw;
-    using std::left;
-    using std::right;
-    using std::fixed;
-    using std::setprecision;
-
-    const std::string sep(72, '-');
-
-    cout << "\n" << sep << "\n";
-    cout << "  ПАРАЛЛЕЛЬНОЕ СРАВНЕНИЕ МЕТОДОВ ИНТЕРПОЛЯЦИИ\n";
-    cout << "  Критерий: score = " << kAlpha << "*E/Emax + "
-         << (1.0 - kAlpha) << "*T/Tmax  (меньше = лучше)\n";
-    cout << sep << "\n";
-    cout << left  << setw(28) << "  Метод"
-         << right << setw(16) << "maxError"
-         << setw(12) << "T (мс)"
-         << setw(10) << "Score"
-         << "\n";
-    cout << sep << "\n";
-
-    for (int i = 0; i < results.size(); ++i) {
-        const auto& r = results[i];
-        std::string mark = (i == bestIdx) ? " ★" : "  ";
-        cout << left  << setw(28) << (mark + r.name.toStdString())
-             << right << setw(16) << fixed << setprecision(6) << r.maxError
-             << setw(12) << setprecision(3)  << r.elapsedMs
-             << setw(10) << setprecision(4)  << r.score
-             << "\n";
-    }
-
-    cout << sep << "\n";
-    if (bestIdx >= 0 && bestIdx < results.size()) {
-        const auto& best = results[bestIdx];
-        cout << "  ★ ЛУЧШИЙ МЕТОД: " << best.name.toStdString()
-             << "  (error=" << fixed << setprecision(6) << best.maxError
-             << ",  time=" << setprecision(3) << best.elapsedMs << " мс"
-             << ",  score=" << setprecision(4) << best.score << ")\n";
-    }
-    cout << sep << "\n\n";
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-
+//Эту штуку можно запихать в QWidget
 QString MethodSelector::toHtmlTable(const QVector<MethodResult>& results, int bestIdx)
 {
     QString html;
@@ -136,3 +88,49 @@ QString MethodSelector::toHtmlTable(const QVector<MethodResult>& results, int be
 
     return html;
 }
+
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+void MethodSelector::printResults(const QVector<MethodResult>& results, int bestIdx)
+{
+  using namespace std;
+
+    const std::string sep(72, '-');
+
+    cout << "\n" << sep << "\n";
+    cout << "  ПАРАЛЛЕЛЬНОЕ СРАВНЕНИЕ МЕТОДОВ ИНТЕРПОЛЯЦИИ\n";
+    cout << "  Критерий: score = " << kAlpha << "*E/Emax + "
+         << (1.0 - kAlpha) << "*T/Tmax  (меньше = лучше)\n";
+    cout << sep << "\n";
+    cout << left  << setw(28) << "  Метод"
+         << right << setw(16) << "maxError"
+         << setw(12) << "T (мс)"
+         << setw(10) << "Score"
+         << "\n";
+    cout << sep << "\n";
+
+    for (int i = 0; i < results.size(); ++i) {
+        const auto& r = results[i];
+        std::string mark = (i == bestIdx) ? " ★" : "  ";
+        cout << left  << setw(28) << (mark + r.name.toStdString())
+             << right << setw(16) << fixed << setprecision(6) << r.maxError
+             << setw(12) << setprecision(3)  << r.elapsedMs
+             << setw(10) << setprecision(4)  << r.score
+             << "\n";
+    }
+
+    cout << sep << "\n";
+    if (bestIdx >= 0 && bestIdx < results.size()) {
+        const auto& best = results[bestIdx];
+        cout << "  ★ ЛУЧШИЙ МЕТОД: " << best.name.toStdString()
+             << "  (error=" << std::scientific << setprecision(6) << best.maxError
+             << ",  time=" << setprecision(3) << best.elapsedMs << " мс"
+             << ",  score=" << setprecision(4) << best.score << ")\n";
+    }
+    cout << sep << "\n\n";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────

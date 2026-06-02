@@ -51,7 +51,7 @@ MethodResult MethodRunner::runMethod1()
     MethodResult r;
     r.methodId = 1;
     r.name     = QStringLiteral("Бессель (task3)");
-
+    // Нет гонки-
     // Локальные буферы — не пересекаются с другими потоками
     const int N = m_input.nx * m_input.ny;
     std::vector<double> a3dx(N), a3dy(N), a3dxy(N);
@@ -62,18 +62,16 @@ MethodResult MethodRunner::runMethod1()
     computeAllDerivatives(m_input.nx, m_input.ny,
                           m_input.x,  m_input.y, m_input.f,
                           a3dx, a3dy, a3dxy);
-    auto t1 = Clock::now();
-    // 2) Оценка погрешности на тестовой сетке
-    r.maxError = GetMaxError(m_input.a, m_input.b, m_input.c, m_input.d,
-                        m_input.f, [&](double x, double y) {
-                            return GetValue13(x, y,
-                                              m_input.x, m_input.nx,
-                                              m_input.y, m_input.ny,
-                                              m_input.f,
-                                              a3dx, a3dy, a3dxy);
-                        }, std::max(m_input.mx, kMinTestN), std::max(m_input.my, kMinTestN));
-
     
+    // 2) Оценка погрешности на тестовой сетке
+    r.maxError = computeMaxError([&](double x, double y) {
+        return GetValue13(x, y,
+                          m_input.x, m_input.nx,
+                          m_input.y, m_input.ny,
+                          m_input.f,
+                          a3dx, a3dy, a3dxy);
+    }, m_input.func);
+    auto t1 = Clock::now();
     r.elapsedMs = std::chrono::duration<double, std::milli>(t1 - t0).count();
     r.valid     = true;
     return r;
@@ -96,14 +94,14 @@ MethodResult MethodRunner::runMethod2()
     computeAllDerivatives31(m_input.nx, m_input.ny,
                             m_input.x,  m_input.y, m_input.f,
                             a4dx, a4dy, a4dxy);
-
+    
     r.maxError = computeMaxError([&](double x, double y) {
         return GetValue31(x, y,
                           m_input.x, m_input.nx,
                           m_input.y, m_input.ny,
                           m_input.f,
                           a4dx, a4dy, a4dxy);
-    });
+    }, m_input.func);
 
     auto t1 = Clock::now();
     r.elapsedMs = std::chrono::duration<double, std::milli>(t1 - t0).count();
@@ -118,20 +116,20 @@ MethodResult MethodRunner::runMethod3()
 
     MethodResult r;
     r.methodId = 3;
-    r.name     = QStringLiteral("Эрмит точн. (task5)");
+    r.name     = QStringLiteral("Эрмит (task5)");
 
     // Точные производные уже вычислены в SharedInputData::dx/dy/dxy —
     // этот метод не требует этапа построения коэффициентов.
 
     auto t0 = Clock::now();
 
-    r.maxError = computeMaxError([&](double x, double y) {
+    r.maxError =computeMaxError([&](double x, double y) {
         return GetValue5(x, y,
-                         m_input.x, m_input.nx,
-                         m_input.y, m_input.ny,
-                         m_input.f,
-                         m_input.dx, m_input.dy, m_input.dxy);
-    });
+                          m_input.x, m_input.nx,
+                          m_input.y, m_input.ny,
+                          m_input.f,
+                          m_input.dx, m_input.dy, m_input.dxy);
+    }, m_input.func);
 
     auto t1 = Clock::now();
     r.elapsedMs = std::chrono::duration<double, std::milli>(t1 - t0).count();
@@ -152,14 +150,12 @@ MethodResult MethodRunner::runMethod4()
 
     auto t0 = Clock::now();
 
-    // Построение коэффициентов: GetCoefficients6 принимает точную функцию как λ
-    auto exactFn = [this](double x, double y) {
-        return GetExactValue(x, y, m_input.k);
-    };
+    // Построение коэффициентов: GetCoefficients6 принимает точную функцию
+    
     GetCoefficients6(m_input.nx, m_input.ny,
                      m_input.a,  m_input.b,
                      m_input.c,  m_input.d,
-                     exactFn, c6);
+                     m_input.func, c6);
 
     r.maxError = computeMaxError([&](double x, double y) {
         return GetValue6(x, y,
@@ -167,7 +163,7 @@ MethodResult MethodRunner::runMethod4()
                          m_input.c, m_input.d,
                          c6,
                          m_input.nx, m_input.ny);
-    });
+    }, m_input.func);
 
     auto t1 = Clock::now();
     r.elapsedMs = std::chrono::duration<double, std::milli>(t1 - t0).count();

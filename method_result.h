@@ -5,11 +5,11 @@
 /// Результат работы одного метода интерполяции в отдельном потоке.
 struct MethodResult {
     int     methodId  = 0;     // 1..4
-    QString name;              // название метода
+    QString name;              
     double  maxError  = 0.0;   // max|approx(x,y) - f(x,y)| на тестовой сетке
-    double  elapsedMs = 0.0;   // время выполнения (мс)
+    double  elapsedMs = 0.0;   
     double  score     = 0.0;   // критерий — заполняет MethodSelector
-    bool    valid     = false; // true если метод выполнился без ошибок
+    bool    valid     = false; 
 };
 
 // Регистрируем типы для передачи через очередь сигналов Qt
