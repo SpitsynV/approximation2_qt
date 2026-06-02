@@ -37,6 +37,7 @@ Approximator2D::Approximator2D(double a, double b, double c, double d,
     //6
     m_c6.resize((m_nx)*(m_ny),0.0);
 
+
     initGrid();
 }
 
@@ -95,6 +96,11 @@ void Approximator2D::rebuild()
 
 
 }
+void Approximator2D::setP(int p)
+{
+    m_p = p;
+    rebuild();
+}
 double Approximator2D::getMaxError1() const
 {
     if (m_nx < 2 || m_ny<2) return -1.0;
@@ -141,7 +147,7 @@ void Approximator2D::nextK()
 
 void Approximator2D::nextGraphMode()
 {
-    m_graphMode = (m_graphMode + 1) % 5;  // 0..4
+    m_graphMode = (m_graphMode + 1) % 6;  // 0..5
 }
 
 QString Approximator2D::functionName() const
@@ -198,6 +204,12 @@ std::function<double(double, double)> Approximator2D::getPlotFunc() const
         return [this](double x, double y){ return this->approx2(x, y); };
     case 4:  // погрешность метода 2
         return [this](double x, double y){ return this->approx2(x, y) - this->f(x, y); };
+    case 5:  // лучший метод
+        if(IDX==1)return [this](double x, double y){ return this->approx1(x, y); };
+        else if(IDX==2)return [this](double x, double y){ return this->approx2(x, y); };
+        else if(IDX==3)return [this](double x, double y){ return this->approx3(x, y); };
+        else if(IDX==4)return [this](double x, double y){ return this->approx4(x, y); };
+        
     default:
         return [](double, double){ return 0.0; };
     }
@@ -211,6 +223,7 @@ QString Approximator2D::getPlotName() const
     case 2: return "Error1 = P1-f";
     case 3: return "Approx2";
     case 4: return "Error2 = P2-f";
+    case 5: return "Best Approximation";
     default: return "";
     }
 }
@@ -231,6 +244,7 @@ SharedInputData Approximator2D::extractSharedInput() const
     d.dy  = m_dy;
     d.dxy = m_dxy;
 
-    d.func = [this](double x, double y) { return this->f(x, y); };
+    auto copy = *this; //ВСЯ ВОТ ЭТА НАГРУЗКА ТОЛЬКО ЧТОБЫ ВОЗМУЩЕНИЕ P РАБОТАЛО КОРРЕКТНО
+    d.func = [copy](double x, double y) mutable { return copy.f(x, y); };
     return d;
 }

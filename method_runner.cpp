@@ -34,7 +34,6 @@ void MethodRunner::run()
 }
 
 // ───расчёт погрешности ────────────────────────────────────────────
-//template<typename Fn>
 double MethodRunner::computeMaxError(std::function<double(double, double)> approxFn, std::function<double(double, double)> exactFn) const
 {
    

@@ -60,7 +60,7 @@ double maxAbsoluteErrorParallel(double a, double b, double c, double d,
         //сколько итераций возьмёт этот поток
         int myCount = chunkSize + (t < remainder ? 1 : 0);
         int endIdx = startIdx + myCount;  // не включая
-        //те на блок [StartIdx, endIdx)
+                                        //те на блок [StartIdx, endIdx)
 
         // Запускаем поток
         threads.emplace_back([&, start = startIdx, end = endIdx, t]() {

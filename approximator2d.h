@@ -46,7 +46,7 @@ public:
     // Сеттеры
     void setNx(int nx);
     void setNy(int ny);
-    void setP(int p)        { m_p = p; }
+    void setP(int p);
     void setScaleExp(int s) { m_scale = s; }
     void setGraphMode(int m){ m_graphMode = m; }
     void setAngle(double a) { m_angle = a; }
@@ -68,6 +68,13 @@ public:
     QString getPlotName() const;
     //
     SharedInputData extractSharedInput() const;
+    ///Результат для лучшего метода
+    int IDX=-1;
+    void setIDX(int i){IDX=i;};
+
+
+
+
 private:
     double m_a, m_b, m_c, m_d;   // область [a,b]x[c,d]
     int    m_nx, m_ny;            // число точек интерполяции

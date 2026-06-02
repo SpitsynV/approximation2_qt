@@ -224,7 +224,7 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     fprintf(stderr, "Time taken 4 method: %e seconds\n", elapsed.count());  
     */
     /*      Погрешность         */
-    /*
+    
     std::chrono::duration<double> elapsed;
     auto start = std::chrono::high_resolution_clock::now();
     fprintf(stderr, "Max error method 1 = %e\n", m_approx->getMaxError1());
@@ -246,7 +246,7 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     end = std::chrono::high_resolution_clock::now();
     elapsed = end - start;
     fprintf(stderr, "Time err 4: %e seconds\n", elapsed.count());
-        */
+        
     // не меняем состояние и не перерисовываем
     return;
     }
@@ -293,6 +293,15 @@ void PlotWidget2D::keyPressEvent(QKeyEvent *event)
     case Qt::Key_6:
         m_approx->setP(m_approx->p() + 1);
         needRebuild = true;
+        {
+            int iimid = m_approx->nx() / 2;
+            int jjmid = m_approx->ny() / 2;
+            //m_f[imid * m_approx->ny() + jmid] += m_approx->p() * 0.1 * m_approx->maxAbsF();
+            double pointx=m_approx->a() + iimid * (m_approx->b() - m_approx->a()) / (m_approx->nx() - 1);
+            double pointy=m_approx->c() + jjmid * (m_approx->d() - m_approx->c()) / (m_approx->ny() - 1);
+            fprintf(stderr, "New f(%g, %g)=  %e\n", pointx, pointy, m_approx->f(pointx, pointy));
+            //fprintf(stderr, "\nNew f(x_n/2, y_n/2)=  %e\n", m_approx->getFvals()[iimid * m_approx->ny() + jjmid]);
+        }
         break;
 
     // 7 — уменьшить возмущение p на 1
@@ -350,7 +359,7 @@ void PlotWidget2D::onResultsReady(QVector<MethodResult> results, int bestIdx)
 {
     m_runBtn->setEnabled(true);
     m_runBtn->setText(QStringLiteral("Сравнить методы"));
-
+    m_approx->IDX = bestIdx; // для отображения лучшего метода на графике
     // Показать таблицу
     const QString html = MethodSelector::toHtmlTable(results, bestIdx);
     m_resultsLabel->setText(html);

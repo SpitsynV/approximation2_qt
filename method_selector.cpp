@@ -70,7 +70,7 @@ QString MethodSelector::toHtmlTable(const QVector<MethodResult>& results, int be
 
         html += QStringLiteral("<tr%1><td>%2%3</td><td>%4</td><td>%5</td><td>%6</td></tr>")
                     .arg(rowClass)
-                    .arg(isBest ? QStringLiteral("★ ") : QStringLiteral(""))
+                    .arg(isBest ? QStringLiteral("(!) ") : QStringLiteral(""))
                     .arg(r.name.toHtmlEscaped())
                     .arg(r.maxError,  0, 'e', 3)
                     .arg(r.elapsedMs, 0, 'f', 2)
@@ -82,7 +82,7 @@ QString MethodSelector::toHtmlTable(const QVector<MethodResult>& results, int be
     if (bestIdx >= 0 && bestIdx < results.size()) {
         html += QStringLiteral(
             "<p style='margin:4px 0 0 0;font-size:12px;font-family:monospace;"
-            "color:#1a6e1a;font-weight:bold'>★ Лучший: %1</p>"
+            "color:#1a6e1a;font-weight:bold'>(!) Лучший: %1</p>"
         ).arg(results[bestIdx].name.toHtmlEscaped());
     }
 
@@ -114,7 +114,7 @@ void MethodSelector::printResults(const QVector<MethodResult>& results, int best
 
     for (int i = 0; i < results.size(); ++i) {
         const auto& r = results[i];
-        std::string mark = (i == bestIdx) ? " ★" : "  ";
+        std::string mark = (i == bestIdx) ? " (!)" : "  ";
         cout << left  << setw(28) << (mark + r.name.toStdString())
              << right << setw(16) << fixed << setprecision(6) << r.maxError
              << setw(12) << setprecision(3)  << r.elapsedMs
@@ -125,7 +125,7 @@ void MethodSelector::printResults(const QVector<MethodResult>& results, int best
     cout << sep << "\n";
     if (bestIdx >= 0 && bestIdx < results.size()) {
         const auto& best = results[bestIdx];
-        cout << "  ★ ЛУЧШИЙ МЕТОД: " << best.name.toStdString()
+        cout << "  (!)ЛУЧШИЙ МЕТОД: " << best.name.toStdString()
              << "  (error=" << std::scientific << setprecision(6) << best.maxError
              << ",  time=" << setprecision(3) << best.elapsedMs << " мс"
              << ",  score=" << setprecision(4) << best.score << ")\n";

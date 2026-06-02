@@ -13,7 +13,6 @@ class ParallelRunner : public QObject {
 public:
     explicit ParallelRunner(QObject* parent = nullptr);
 
-    /// Синхронный запуск: блокирует текущий поток до завершения всех 4 методов.
     /// Возвращает заполненный вектор результатов.
     QVector<MethodResult> runAll(const SharedInputData& input, int& bestIdx);
 

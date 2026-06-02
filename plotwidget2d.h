@@ -17,6 +17,8 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
+
+
 protected:
     void paintEvent(QPaintEvent *) override;
     void keyPressEvent(QKeyEvent *event) override;
