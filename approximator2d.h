@@ -4,6 +4,7 @@
 #include <QString>
 #include <QColor>
 #include "error.h"
+#include "shared_input.h"
 
 // Аналог Approximator из 1D-задачи — управляет состоянием и пересчётом
 class Approximator2D
@@ -65,7 +66,8 @@ public:
     // functor(x,y) -> значение
     std::function<double(double, double)> getPlotFunc() const;
     QString getPlotName() const;
-
+    //
+    SharedInputData extractSharedInput() const;
 private:
     double m_a, m_b, m_c, m_d;   // область [a,b]x[c,d]
     int    m_nx, m_ny;            // число точек интерполяции
@@ -104,4 +106,5 @@ private:
                             //Метод не требуе производных
 
     void initGrid();
+    
 };
